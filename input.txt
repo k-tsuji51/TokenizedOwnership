@@ -1,0 +1,796 @@
+commit 7b91acc24e5eb43882e592651039613d4a4a1ead
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Wed Nov 8 11:52:36 2017 +1100
+
+    WFLY-9534 Remove some unused code from the EJB subsystem
+    
+    
+    Former-commit-id: daefbe5fa4b85178580d649f003a98659e6d3b3a
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index 0564b57..02ad5db 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -78,22 +78,6 @@ name|ee
+ operator|.
+ name|component
+ operator|.
+-name|EEApplicationClasses
+-import|;
+-end_import
+-
+-begin_import
+-import|import
+-name|org
+-operator|.
+-name|jboss
+-operator|.
+-name|as
+-operator|.
+-name|ee
+-operator|.
+-name|component
+-operator|.
+ name|EEModuleDescription
+ import|;
+ end_import
+@@ -205,10 +189,6 @@ parameter_list|,
+ specifier|final
+ name|ServiceName
+ name|deploymentUnitServiceName
+-parameter_list|,
+-specifier|final
+-name|EEApplicationClasses
+-name|applicationClassesDescription
+ parameter_list|)
+ block|{
+ name|super
+
+commit 375ac64bebd329fd6226e9e7bf38cf3cc84b042e
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Fri Jun 26 17:51:56 2015 +0200
+
+    Remove type paramaters from ClassReflectionIndex
+    
+    This type only referes to deployment classes, the type paramter will never be a known type
+    
+    
+    Former-commit-id: ff135fdb4979ba9e6c6d9b3637cd0a22eee2ff80
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index 5aabc24..0564b57 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -247,9 +247,6 @@ name|createConfiguration
+ parameter_list|(
+ specifier|final
+ name|ClassReflectionIndex
+-argument_list|<
+-name|?
+-argument_list|>
+ name|classIndex
+ parameter_list|,
+ specifier|final
+
+commit c00e29600553bc9eb897a83d2468863b55551dd9
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Fri Jun 26 11:20:18 2015 +0200
+
+    WFLY-4835 remove references to ClassIndex
+    
+    
+    Former-commit-id: 406dd3c6b3883abdcde3ecaae1d5053ad8cb3696
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index 62f1be5..5aabc24 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -126,7 +126,7 @@ name|deployment
+ operator|.
+ name|reflect
+ operator|.
+-name|ClassIndex
++name|ClassReflectionIndex
+ import|;
+ end_import
+ 
+@@ -246,7 +246,10 @@ name|ComponentConfiguration
+ name|createConfiguration
+ parameter_list|(
+ specifier|final
+-name|ClassIndex
++name|ClassReflectionIndex
++argument_list|<
++name|?
++argument_list|>
+ name|classIndex
+ parameter_list|,
+ specifier|final
+
+commit 2f2c028a587dda6fa77aab7635466c2962af5358
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Mon Mar 25 16:47:02 2013 +1100
+
+    Add @AroundConstruct support
+    
+    
+    Former-commit-id: 68fd04bf10b6b0ebb6e6f1167e110b31bc869998
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index c352cae..62f1be5 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -62,7 +62,7 @@ name|ee
+ operator|.
+ name|component
+ operator|.
+-name|EEApplicationClasses
++name|ComponentFactory
+ import|;
+ end_import
+ 
+@@ -78,7 +78,7 @@ name|ee
+ operator|.
+ name|component
+ operator|.
+-name|EEModuleDescription
++name|EEApplicationClasses
+ import|;
+ end_import
+ 
+@@ -90,9 +90,11 @@ name|jboss
+ operator|.
+ name|as
+ operator|.
+-name|naming
++name|ee
+ operator|.
+-name|ManagedReference
++name|component
++operator|.
++name|EEModuleDescription
+ import|;
+ end_import
+ 
+@@ -106,7 +108,7 @@ name|as
+ operator|.
+ name|naming
+ operator|.
+-name|ManagedReferenceFactory
++name|ManagedReference
+ import|;
+ end_import
+ 
+@@ -134,6 +136,18 @@ name|org
+ operator|.
+ name|jboss
+ operator|.
++name|invocation
++operator|.
++name|InterceptorContext
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
+ name|modules
+ operator|.
+ name|ModuleLoader
+@@ -264,15 +278,19 @@ operator|.
+ name|setInstanceFactory
+ argument_list|(
+ operator|new
+-name|ManagedReferenceFactory
++name|ComponentFactory
+ argument_list|()
+ block|{
+ annotation|@
+ name|Override
+ specifier|public
+ name|ManagedReference
+-name|getReference
+-parameter_list|()
++name|create
++parameter_list|(
++specifier|final
++name|InterceptorContext
++name|context
++parameter_list|)
+ block|{
+ return|return
+ operator|new
+
+commit 72ca9ad9662f9912b57f62607b6d5ddff38726f3
+Author: Maas van den Berg <maasvdberg@gmail.com>
+Date:   Tue Feb 14 23:56:14 2012 +0100
+
+    spelling and typos
+    
+    spelling and typos
+    
+    
+    Former-commit-id: c02851bdd6f06c244b35f3c31762fde251b64ceb
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index fc2d638..c352cae 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -237,7 +237,7 @@ name|classIndex
+ parameter_list|,
+ specifier|final
+ name|ClassLoader
+-name|moduleClassLoder
++name|moduleClassLoader
+ parameter_list|,
+ specifier|final
+ name|ModuleLoader
+@@ -254,7 +254,7 @@ name|createConfiguration
+ argument_list|(
+ name|classIndex
+ argument_list|,
+-name|moduleClassLoder
++name|moduleClassLoader
+ argument_list|,
+ name|moduleLoader
+ argument_list|)
+
+commit 4970fcbd9a7fc04ba0b6f868bb93791c80e4ebdc
+Author: Paul Ferraro <paul.ferraro@redhat.com>
+Date:   Wed Feb 15 13:44:34 2012 -0500
+
+    AS7-3761 Change SFSB serialization to use ModularClassResolver
+    
+    
+    Former-commit-id: 8296d7a17f7d26cfb7e9014c62501e2fdb392918
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index a194fa0..fc2d638 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -134,6 +134,18 @@ name|org
+ operator|.
+ name|jboss
+ operator|.
++name|modules
++operator|.
++name|ModuleLoader
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
+ name|msc
+ operator|.
+ name|service
+@@ -226,6 +238,10 @@ parameter_list|,
+ specifier|final
+ name|ClassLoader
+ name|moduleClassLoder
++parameter_list|,
++specifier|final
++name|ModuleLoader
++name|moduleLoader
+ parameter_list|)
+ block|{
+ specifier|final
+@@ -239,6 +255,8 @@ argument_list|(
+ name|classIndex
+ argument_list|,
+ name|moduleClassLoder
++argument_list|,
++name|moduleLoader
+ argument_list|)
+ decl_stmt|;
+ name|configuration
+
+commit fd799a796b7c5742d0598d2faad62c5a7116d8db
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Mon Nov 21 08:43:47 2011 +1100
+
+    Use correct Class Loader
+    
+    
+    Former-commit-id: eebb702b804770182b864c8324bb9a78db1f0649
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index 19ae95c..a194fa0 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -222,6 +222,10 @@ parameter_list|(
+ specifier|final
+ name|ClassIndex
+ name|classIndex
++parameter_list|,
++specifier|final
++name|ClassLoader
++name|moduleClassLoder
+ parameter_list|)
+ block|{
+ specifier|final
+@@ -233,6 +237,8 @@ operator|.
+ name|createConfiguration
+ argument_list|(
+ name|classIndex
++argument_list|,
++name|moduleClassLoder
+ argument_list|)
+ decl_stmt|;
+ name|configuration
+
+commit 9dbf6e701a7f65383b55efc349d3157d35f79658
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Wed Nov 9 11:50:54 2011 +1100
+
+    AS7-2077 Add support for optional components that don't fail the deployment if not present
+    
+    
+    Former-commit-id: b94039ea3f14070750c167ce589ac6c06026be95
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index fef63ff..19ae95c 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -203,7 +203,7 @@ argument_list|)
+ expr_stmt|;
+ block|}
+ DECL|method|isIntercepted
+-specifier|private
++specifier|public
+ name|boolean
+ name|isIntercepted
+ parameter_list|()
+
+commit 844c394b2b4464c71a355e3052ea7ff54cb623c6
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Tue Oct 11 17:36:08 2011 +1100
+
+    Implement correct interceptor method overriding behaviour
+    
+    
+    Former-commit-id: 027b994767dffd3691c85ef0426d4681800399d3
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index 9219fa1..fef63ff 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -194,8 +194,6 @@ argument_list|,
+ name|moduleDescription
+ argument_list|,
+ name|deploymentUnitServiceName
+-argument_list|,
+-name|applicationClassesDescription
+ argument_list|)
+ expr_stmt|;
+ name|setExcludeDefaultInterceptors
+
+commit 723bdfd1a560bf0f1a2957f9cfd119f00455b08f
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Tue Oct 11 12:34:03 2011 +1100
+
+    More changes, now deploys some apps
+    
+    
+    Former-commit-id: fb73432910aa872b544eb80e87e05e94e7721dda
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index e7c7b57..9219fa1 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -78,7 +78,7 @@ name|ee
+ operator|.
+ name|component
+ operator|.
+-name|EEApplicationDescription
++name|EEModuleDescription
+ import|;
+ end_import
+ 
+@@ -90,11 +90,9 @@ name|jboss
+ operator|.
+ name|as
+ operator|.
+-name|ee
+-operator|.
+-name|component
++name|naming
+ operator|.
+-name|EEModuleDescription
++name|ManagedReference
+ import|;
+ end_import
+ 
+@@ -108,7 +106,7 @@ name|as
+ operator|.
+ name|naming
+ operator|.
+-name|ManagedReference
++name|ManagedReferenceFactory
+ import|;
+ end_import
+ 
+@@ -120,9 +118,13 @@ name|jboss
+ operator|.
+ name|as
+ operator|.
+-name|naming
++name|server
+ operator|.
+-name|ManagedReferenceFactory
++name|deployment
++operator|.
++name|reflect
++operator|.
++name|ClassIndex
+ import|;
+ end_import
+ 
+@@ -220,8 +222,8 @@ name|ComponentConfiguration
+ name|createConfiguration
+ parameter_list|(
+ specifier|final
+-name|EEApplicationDescription
+-name|applicationDescription
++name|ClassIndex
++name|classIndex
+ parameter_list|)
+ block|{
+ specifier|final
+@@ -232,7 +234,7 @@ name|super
+ operator|.
+ name|createConfiguration
+ argument_list|(
+-name|applicationDescription
++name|classIndex
+ argument_list|)
+ decl_stmt|;
+ name|configuration
+
+commit 16d08664d4d375c39bebe96f7e006ea327558417
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Tue Oct 11 09:59:13 2011 +1100
+
+    Change to module scoped class descriptions
+    
+    
+    Former-commit-id: bd8ca4e468782894373a3311a18d0cee32845133
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+index b4d8c9f..e7c7b57 100644
+--- a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -191,13 +191,6 @@ name|componentClassName
+ argument_list|,
+ name|moduleDescription
+ argument_list|,
+-name|applicationClassesDescription
+-operator|.
+-name|getOrAddClassByName
+-argument_list|(
+-name|componentClassName
+-argument_list|)
+-argument_list|,
+ name|deploymentUnitServiceName
+ argument_list|,
+ name|applicationClassesDescription
+
+commit 8c8b5039262dcbeeca00e598418644cc837c804e
+Author: Stuart Douglas <stuart.w.douglas@gmail.com>
+Date:   Thu Oct 6 15:24:06 2011 +1100
+
+    Implement app client injection
+    
+    
+    Former-commit-id: 21c42698945b95423f8190983c026037b546800b
+
+diff --git a/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+new file mode 100644
+index 0000000..b4d8c9f
+--- /dev/null
++++ b/appclient/src/main/java/org/jboss/as/appclient/component/ApplicationClientComponentDescription.java
+@@ -0,0 +1,298 @@
++begin_unit|revision:0.9.5;language:Java;cregit-version:0.0.1
++begin_comment
++comment|/*  * JBoss, Home of Professional Open Source.  * Copyright 2011, Red Hat, Inc., and individual contributors  * as indicated by the @author tags. See the copyright.txt file in the  * distribution for a full listing of individual contributors.  *  * This is free software; you can redistribute it and/or modify it  * under the terms of the GNU Lesser General Public License as  * published by the Free Software Foundation; either version 2.1 of  * the License, or (at your option) any later version.  *  * This software is distributed in the hope that it will be useful,  * but WITHOUT ANY WARRANTY; without even the implied warranty of  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU  * Lesser General Public License for more details.  *  * You should have received a copy of the GNU Lesser General Public  * License along with this software; if not, write to the Free  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.  */
++end_comment
++
++begin_package
++DECL|package|org.jboss.as.appclient.component
++package|package
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|appclient
++operator|.
++name|component
++package|;
++end_package
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|ee
++operator|.
++name|component
++operator|.
++name|ComponentConfiguration
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|ee
++operator|.
++name|component
++operator|.
++name|ComponentDescription
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|ee
++operator|.
++name|component
++operator|.
++name|EEApplicationClasses
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|ee
++operator|.
++name|component
++operator|.
++name|EEApplicationDescription
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|ee
++operator|.
++name|component
++operator|.
++name|EEModuleDescription
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|naming
++operator|.
++name|ManagedReference
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|as
++operator|.
++name|naming
++operator|.
++name|ManagedReferenceFactory
++import|;
++end_import
++
++begin_import
++import|import
++name|org
++operator|.
++name|jboss
++operator|.
++name|msc
++operator|.
++name|service
++operator|.
++name|ServiceName
++import|;
++end_import
++
++begin_comment
++comment|/**  * @author Stuart Douglas  */
++end_comment
++
++begin_class
++DECL|class|ApplicationClientComponentDescription
++specifier|public
++specifier|final
++class|class
++name|ApplicationClientComponentDescription
++extends|extends
++name|ComponentDescription
++block|{
++DECL|field|APP_CLIENT_COMPONENT_NAME
++specifier|public
++specifier|static
++specifier|final
++name|String
++name|APP_CLIENT_COMPONENT_NAME
++init|=
++literal|"AppClientComponent"
++decl_stmt|;
++DECL|method|ApplicationClientComponentDescription
++specifier|public
++name|ApplicationClientComponentDescription
++parameter_list|(
++specifier|final
++name|String
++name|componentClassName
++parameter_list|,
++specifier|final
++name|EEModuleDescription
++name|moduleDescription
++parameter_list|,
++specifier|final
++name|ServiceName
++name|deploymentUnitServiceName
++parameter_list|,
++specifier|final
++name|EEApplicationClasses
++name|applicationClassesDescription
++parameter_list|)
++block|{
++name|super
++argument_list|(
++name|APP_CLIENT_COMPONENT_NAME
++argument_list|,
++name|componentClassName
++argument_list|,
++name|moduleDescription
++argument_list|,
++name|applicationClassesDescription
++operator|.
++name|getOrAddClassByName
++argument_list|(
++name|componentClassName
++argument_list|)
++argument_list|,
++name|deploymentUnitServiceName
++argument_list|,
++name|applicationClassesDescription
++argument_list|)
++expr_stmt|;
++name|setExcludeDefaultInterceptors
++argument_list|(
++literal|true
++argument_list|)
++expr_stmt|;
++block|}
++DECL|method|isIntercepted
++specifier|private
++name|boolean
++name|isIntercepted
++parameter_list|()
++block|{
++return|return
++literal|false
++return|;
++block|}
++annotation|@
++name|Override
++DECL|method|createConfiguration
++specifier|public
++name|ComponentConfiguration
++name|createConfiguration
++parameter_list|(
++specifier|final
++name|EEApplicationDescription
++name|applicationDescription
++parameter_list|)
++block|{
++specifier|final
++name|ComponentConfiguration
++name|configuration
++init|=
++name|super
++operator|.
++name|createConfiguration
++argument_list|(
++name|applicationDescription
++argument_list|)
++decl_stmt|;
++name|configuration
++operator|.
++name|setInstanceFactory
++argument_list|(
++operator|new
++name|ManagedReferenceFactory
++argument_list|()
++block|{
++annotation|@
++name|Override
++specifier|public
++name|ManagedReference
++name|getReference
++parameter_list|()
++block|{
++return|return
++operator|new
++name|ManagedReference
++argument_list|()
++block|{
++annotation|@
++name|Override
++specifier|public
++name|void
++name|release
++parameter_list|()
++block|{                      }
++annotation|@
++name|Override
++specifier|public
++name|Object
++name|getInstance
++parameter_list|()
++block|{
++return|return
++literal|null
++return|;
++block|}
++block|}
++return|;
++block|}
++block|}
++argument_list|)
++expr_stmt|;
++return|return
++name|configuration
++return|;
++block|}
++empty_stmt|;
++block|}
++end_class
++
++end_unit
++
