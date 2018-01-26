@@ -19,7 +19,6 @@ public class CloneSet{
 	public void showCloneFiles(){
 		System.out.println(cloneSetID);
 		for(CloneFileWithRename cloneFile: cloneFiles){
-			System.out.println("original:"+cloneFile.fileName);
 			cloneFile.showRenameFiles();
 		}
 	}

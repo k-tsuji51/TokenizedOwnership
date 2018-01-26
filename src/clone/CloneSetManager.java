@@ -1,9 +1,12 @@
 package clone;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -23,6 +26,8 @@ public class CloneSetManager {
 	static final String renameFileList = util.StringUtil.REVERSED_RENAMELIST;
 
 	static Logger logger = Logger.getLogger("loggerName");
+	String outputFileName = util.StringUtil.RENAMED_CLONESET_OUTPUT;
+
 
 	ArrayList<CloneSet> cloneSetList = new ArrayList<CloneSet>();
 
@@ -47,6 +52,7 @@ public class CloneSetManager {
 
 	public static void main(String[] args){
 		CloneSetManager csm = new CloneSetManager(cloneListFileName);
+		csm.printCloneSetListToTextFile();
 	}
 
 	private void loadCloneList(String cloneListFileName) {
@@ -88,5 +94,28 @@ public class CloneSetManager {
 			cs.showCloneFiles();
 		}
 	}
+
+	public void printCloneSetListToTextFile(){
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(outputFileName)));
+			for(CloneSet cs : cloneSetList){
+				pw.println("#CloneSet" + cs.cloneSetID);
+				for(CloneFileWithRename cloneRename : cs.cloneFiles){
+					for(String fileName : cloneRename.renames){
+						pw.println(fileName);
+					}
+					pw.println();
+				}
+			}
+
+			pw.close();
+		} catch (IOException e) {
+			logger.info(e.getMessage());
+		}
+
+
+	}
+
+
 
 }
