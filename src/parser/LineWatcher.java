@@ -12,8 +12,7 @@ public class LineWatcher {
 	int plus = 0;
 	int count = 0;
 
-	TokenEditNumberByFile tokenEditNumber = new TokenEditNumberByFile();
-
+	public TokenEditNumberByFile tokenEditNumber = new TokenEditNumberByFile();
 
 	LineWatcher(){
 

@@ -6,7 +6,7 @@ public class CloneFileWithRename {/* リネームの情報を含んだクロー�
 
 	String fileName = "";
 
-	ArrayList<String> renames = new ArrayList<String>();
+	public ArrayList<String> renames = new ArrayList<String>();
 
 	CloneFileWithRename(String fileName){
 		this.fileName = fileName;
@@ -18,7 +18,7 @@ public class CloneFileWithRename {/* リネームの情報を含んだクロー�
 		renames.add(newRename);
 	}
 
-	ArrayList<String> getRenameFiles(){
+	public ArrayList<String> getRenameFiles(){
 		return renames;
 	}
 

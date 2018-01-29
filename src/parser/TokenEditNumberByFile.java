@@ -8,7 +8,7 @@ import java.util.Iterator;
 public class TokenEditNumberByFile {
 	HashMap<String,Integer> commitNumber = new HashMap<String,Integer>();
 
-	TokenEditNumberByFile(){
+	public TokenEditNumberByFile(){
 	}
 
 	public void showCommitNumber() {

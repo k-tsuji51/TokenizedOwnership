@@ -31,7 +31,17 @@ public class CloneSetManager {
 
 	ArrayList<CloneSet> cloneSetList = new ArrayList<CloneSet>();
 
-	CloneSetManager(String cloneFileList) {
+	public ArrayList<CloneSet> getCloneSetList() {
+		return cloneSetList;
+	}
+
+
+	public void setCloneSetList(ArrayList<CloneSet> cloneSetList) {
+		this.cloneSetList = cloneSetList;
+	}
+
+
+	public CloneSetManager(String cloneFileList) {
 		loadCloneList(cloneFileList);
 
 		RenameFileList renameList = new RenameFileList(renameFileList);
@@ -49,11 +59,6 @@ public class CloneSetManager {
 		this.showCloneSet();
 	}
 
-
-	public static void main(String[] args){
-		CloneSetManager csm = new CloneSetManager(cloneListFileName);
-		csm.printCloneSetListToTextFile();
-	}
 
 	private void loadCloneList(String cloneListFileName) {
 		try {
