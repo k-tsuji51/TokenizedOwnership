@@ -11,7 +11,7 @@ public class InputLogParser {
 	String nowMode = "";
 	int lineNumber = 0;
 
-	TokenEditNumberByFile tokenEditNumber = new TokenEditNumberByFile();
+//	TokenEditNumberByFile tokenEditNumber = new TokenEditNumberByFile();
 	LineWatcher lineWatcher = new LineWatcher();
 
 	public InputLogParser() {
@@ -25,16 +25,17 @@ public class InputLogParser {
 			while (str != null) {
 
 				nowMode = lineWatcher.whatModeIsThis(str, prevMode);
-				System.out.println(nowMode + "," + str);
+//			if(fileName.matches(".*10-1-.*"))System.out.println(nowMode + "," + str);
 
 				str = br.readLine();
 				lineNumber++;
 				prevMode = nowMode;
 			}
+			br.close();
 		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
-		return tokenEditNumber;
+
+		return lineWatcher.tokenEditNumber;
 	}
 }

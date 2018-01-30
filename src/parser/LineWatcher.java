@@ -14,7 +14,16 @@ public class LineWatcher {
 
 	public TokenEditNumberByFile tokenEditNumber = new TokenEditNumberByFile();
 
-	LineWatcher(){
+
+	/*リネームを判別するための変数*/
+
+	RenameDetector renameDetector;
+
+	boolean newMode = false;
+	boolean deletedMode = false;
+	boolean isRename = false;
+
+	public LineWatcher(){
 
 	}
 
@@ -47,9 +56,9 @@ public class LineWatcher {
 		case ModeUtil.newFileMode:
 			mode = ModeUtil.indexHatena;
 			break;
-		case ModeUtil.indexHatena:
-			mode = ModeUtil.diffOrigFileName;
-			break;
+		case ModeUtil.indexHatena:/*whatmodeに移行予定*/
+			mode = whatMode(line,prevMode);
+				break;
 		case ModeUtil.diffOrigFileName:
 			mode = ModeUtil.diffNewFileName;
 			break;
@@ -60,13 +69,35 @@ public class LineWatcher {
 			mode = whatMode(line,prevMode);
 			break;
 		}
-		if(mode == ModeUtil.commiterDisplay){
-			committerName = getCommitterFromLine(line);
-			System.out.println(getCommitterFromLine(line));
-		}
+
 		if(mode == ModeUtil.changedTokenLocation){
-			System.out.print(this.countEditNumber(line));
+			if(!isRename){
+				this.countEditNumber(line);
+			}
 		}
+		else if(mode == ModeUtil.commiterDisplay){
+			committerName = getCommitterFromLine(line);
+//			System.out.println(getCommitterFromLine(line));
+		}
+		else if(mode == ModeUtil.newFileMode){/* リネームを判定するための準備処理 */
+			if(line.contains("deleted")){
+//				System.out.println("deletedmode");
+				deletedMode = true;
+			}else if(line.contains("new file mode")){
+//				System.out.println("newmode");
+				newMode = true;
+			}
+		}
+		else if((mode == ModeUtil.diffOrigFileName && deletedMode) || mode == ModeUtil.diffNewFileName && newMode){
+			String fileName = line.substring(6);
+			System.out.println(fileName);
+			renameDetector = new RenameDetector(fileName);
+			if((renameDetector.isBeforeRename && deletedMode )||( renameDetector.isAfterRename && newMode)){
+				this.isRename = true;
+				System.out.println("this is rename commit");
+			}
+		}
+
 		return mode;
 	}
 
@@ -84,7 +115,7 @@ public class LineWatcher {
 			break;
 		case ModeUtil.exeDiffCommand:
 			/*次のmodeは，newFileModeもしくはindexHatena*/
-			if(line.startsWith("new file mode")){
+			if(line.startsWith("new file mode") ||line.startsWith("deleted file mode")){
 				mode = ModeUtil.newFileMode;
 			}
 			else mode = ModeUtil.indexHatena;
@@ -92,12 +123,22 @@ public class LineWatcher {
 		case ModeUtil.changedTokenLocation:
 			/*次のmodeは，changedTokenLocationもしくはcommitIDDisplay*/
 			if(line.startsWith("commit ")){
-				tokenEditNumber.showCommitNumber();
+//				tokenEditNumber.showCommitNumber();
 				commitDataInit(); //編集者が変わるので，コミット毎に編集者と編集回数は初期化する．
 				mode = ModeUtil.commitIDDisplay;
 			}
 			else mode = ModeUtil.changedTokenLocation;
 			break;
+		case ModeUtil.indexHatena:
+			if(line.startsWith("---")){
+				mode = ModeUtil.diffOrigFileName;
+				break;
+			}else if(line.startsWith("commit ")){
+				commitDataInit(); //編集者が変わるので，コミット毎に編集者と編集回数は初期化する．
+				mode = ModeUtil.commitIDDisplay;
+//				System.out.println("No changed logs");
+				break;
+			}else mode = ModeUtil.indexHatena;
 		}
 
 		return mode;
@@ -141,8 +182,11 @@ public class LineWatcher {
 	private void commitDataInit(){
 		this.committerName = "";
 		this.count = 0;
-	}
 
+		isRename = false;
+		newMode = false;
+		deletedMode = false;
+	}
 
 
 }
