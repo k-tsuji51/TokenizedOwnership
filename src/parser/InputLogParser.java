@@ -12,7 +12,7 @@ public class InputLogParser {
 	int lineNumber = 0;
 
 //	TokenEditNumberByFile tokenEditNumber = new TokenEditNumberByFile();
-	LineWatcher lineWatcher = new LineWatcher();
+	public LineWatcher lineWatcher = new LineWatcher();
 
 	public InputLogParser() {
 	}

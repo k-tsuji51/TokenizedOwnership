@@ -7,6 +7,15 @@ import java.util.Iterator;
 
 public class TokenEditNumberByFile {
 	String fileName;
+	String fileID;
+
+	public String getFileID() {
+		return fileID;
+	}
+
+	public void setFileID(String fileID) {
+		this.fileID = fileID;
+	}
 
 	public String getFileName() {
 		return fileName;
@@ -18,6 +27,10 @@ public class TokenEditNumberByFile {
 
 	HashMap<String,Integer> commitNumber = new HashMap<String,Integer>();
 
+
+	public HashMap<String, Integer> getCommitNumber() {
+		return commitNumber;
+	}
 
 	//コミッターの編集回数をカウントしていく
 	public void countCommitNumber(String committer) {

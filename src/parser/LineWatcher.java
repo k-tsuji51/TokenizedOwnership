@@ -90,14 +90,13 @@ public class LineWatcher {
 		}
 		else if((mode == ModeUtil.diffOrigFileName && deletedMode) || mode == ModeUtil.diffNewFileName && newMode){
 			String fileName = line.substring(6);
-			System.out.println(fileName);
+//			System.out.println(fileName);
 			renameDetector = new RenameDetector(fileName);
 			if((renameDetector.isBeforeRename && deletedMode )||( renameDetector.isAfterRename && newMode)){
 				this.isRename = true;
-				System.out.println("this is rename commit");
+//				System.out.println("this is rename commit");
 			}
 		}
-
 		return mode;
 	}
 

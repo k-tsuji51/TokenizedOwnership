@@ -22,4 +22,8 @@ public class CloneSet{
 			cloneFile.showRenameFiles();
 		}
 	}
+
+	public int getCloneFileNum(){
+		return cloneFiles.size();
+	}
 }

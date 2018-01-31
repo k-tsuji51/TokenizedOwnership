@@ -15,6 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import parser.TokenEditNumberByFile;
+
 /*ファイルからクローンセットの読み出しを行う*/
 public class CloneSetManager {
 
@@ -29,7 +31,12 @@ public class CloneSetManager {
 	String outputFileName = util.StringUtil.RENAMED_CLONESET_OUTPUT;
 
 
-	ArrayList<CloneSet> cloneSetList = new ArrayList<CloneSet>();
+	public ArrayList<CloneSet> cloneSetList = new ArrayList<CloneSet>();
+
+	/*データ集計用の変数*/
+	public  ArrayList<TokenEditNumberByFile> editNumbers = new ArrayList<>();
+
+
 
 	public ArrayList<CloneSet> getCloneSetList() {
 		return cloneSetList;
@@ -121,6 +128,9 @@ public class CloneSetManager {
 
 	}
 
-
+	/* クローンセットIDから，そのクローンセットのファイル数を返す */
+	public int cloneSetNumBycsID(int csID){
+		return cloneSetList.get(csID-1).getCloneFileNum();
+	}
 
 }

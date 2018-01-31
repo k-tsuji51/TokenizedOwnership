@@ -2,11 +2,25 @@ package clone;
 
 import java.util.ArrayList;
 
+import parser.TokenEditNumberByFile;
+
 public class CloneFileWithRename {/* リネームの情報を含んだクローンファイルの情報 */
 
-	String fileName = "";
-
+	public String fileName = "";
 	public ArrayList<String> renames = new ArrayList<String>();
+
+	/*トークン編集回数を数える変数*/
+	TokenEditNumberByFile tokenEditNum;
+
+	public TokenEditNumberByFile getTokenEditNum() {
+		return tokenEditNum;
+	}
+
+
+	public void setTokenEditNum(TokenEditNumberByFile tokenEditNum) {
+		this.tokenEditNum = tokenEditNum;
+	}
+
 
 	CloneFileWithRename(String fileName){
 		this.fileName = fileName;
