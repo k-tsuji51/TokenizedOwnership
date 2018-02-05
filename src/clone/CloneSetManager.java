@@ -21,9 +21,8 @@ import parser.TokenEditNumberByFile;
 public class CloneSetManager {
 
 	/*入力するクローンセットが記述されたファイル名と，中にあるファイルリストのファイル名を先頭から何文字削ぐかを指定する*/
-	/*wildfly:47*/
-	static final String cloneListFileName = util.StringUtil.CLONESET_FILELIST;
-	static final int removeHead = 47;
+
+	static final int removeHead = util.StringUtil.REMOVE_HEAD;
 
 	static final String renameFileList = util.StringUtil.REVERSED_RENAMELIST;
 
@@ -36,6 +35,11 @@ public class CloneSetManager {
 	/*データ集計用の変数*/
 	public  ArrayList<TokenEditNumberByFile> editNumbers = new ArrayList<>();
 
+	public static void main(String[] args){
+		String cloneListFileName = util.StringUtil.CLONESET_FILELIST;
+		CloneSetManager csm = new CloneSetManager(cloneListFileName);
+		csm.printCloneSetListToTextFile();
+	}
 
 
 	public ArrayList<CloneSet> getCloneSetList() {
@@ -65,6 +69,8 @@ public class CloneSetManager {
 
 		this.showCloneSet();
 	}
+
+
 
 
 	private void loadCloneList(String cloneListFileName) {

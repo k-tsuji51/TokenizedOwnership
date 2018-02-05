@@ -15,7 +15,6 @@ public class RenameFileList {/*リネームファイルを読んで，順番に�
 	static ArrayList<ArrayList<String>> changedNameListArray = new ArrayList<ArrayList<String>>();
 
 	static String renameInput = util.StringUtil.REVERSED_RENAMELIST;
-	static String outputFile = "";
 
 	static Logger logger = Logger.getLogger ("RenameFileList");
 
